@@ -15,3 +15,4 @@ sudo mount -t overlay -o rw,lowerdir=/run/live/medium/dosbox-files,upperdir=/tmp
 # fix permissions
 chown -R user /home/user
 chgrp -R user /home/user
+chmod +w -R /home/user/dosbox
