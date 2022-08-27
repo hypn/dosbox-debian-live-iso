@@ -3,15 +3,6 @@
 # give user access to the mouse
 usermod -a -G input user
 
-# create a (temporary) writeable filesystem, with the ISO dosbox-files in
-mkdir /tmp/.dosbox-tmpfs
-mkdir /home/user/dosbox
-
-sudo mount -t tmpfs -o rw,nosuid,nodev,noexec,size=512m,mode=0775 tmpfs /tmp/.dosbox-tmpfs
-sudo mkdir -p /tmp/.dosbox-tmpfs/upper
-sudo mkdir -p /tmp/.dosbox-tmpfs/work
-sudo mount -t overlay -o rw,lowerdir=/run/live/medium/dosbox-files,upperdir=/tmp/.dosbox-tmpfs/upper,workdir=/tmp/.dosbox-tmpfs/work overlay /home/user/dosbox
-
 # fix permissions
 chown -R user /home/user
 chgrp -R user /home/user
