@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Dosbox
+Exec=dosbox
+Icon=dosbox
+Terminal=false

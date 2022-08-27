@@ -13,5 +13,5 @@ ln -s /src/cache/packages.bootstrap cache/packages.bootstrap
 # ln -s /src/cache/apt-archives chroot/var/cache/apt/archives
 # mkdir -p chroot/var/cache/apt/
 
-lb config
+lb config --architecture i386
 lb build && echo "Copying .iso to /src..." && cp *.iso /src
