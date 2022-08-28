@@ -1,21 +1,24 @@
-Build with
+# General
+
+Build with the required docker image with:
 
 ```sh
 Docker build -t live-build .
 ```
 
-Run with:
+Then run:
 
 ```sh
 docker run -ti --rm --privileged -v $PWD:/src live-build bash /src/scripts/build.sh
 ```
 
----
+This should produce a `live-image-i386.hybrid.iso` file in this source directory, which can be live booted.
 
-Expect to find lots of `.deb` files in the `cache` directories.
+Expect to find lots of `.deb` files in the `cache` directories - this is to facilitate rebuilding (eg: for tweaking and testing).
 
-The build `.iso` file should be copied into this root directory.
+# Dos files
 
-Files in `config/includes.binary/` (eg: "dosbox-files") will be present in the root of the `.iso` rather than inside the squashfs filesystem. This directory is mounted into `/home/user/dosbox` using overlayfs (making them "writeable" in memory).
+Files can be placed in two locations depending on the use case:
 
-Files in `config/includes.chroot_after_packages` (eg: )
+1. Booting from Easy2Boot/agFM: in a `dosbox-files` directory in the root of the USB drive to be used
+2. Otherwise: in the `config/includes.binary/dosbox-files` for them to be built into the ISO (eg: accessible when the iso is mounted or written to a physical disc) - before running the build step above
