@@ -1,9 +1,17 @@
 #!/bin/bash
 
-# give user access to the mouse
+# remove the user's password
+passwd -d user
+
+# give user access to the mouse (needed by Dosbox)
 usermod -a -G input user
 
 # fix permissions
 chown -R user /home/user
 chgrp -R user /home/user
 chmod +w -R /home/user/dosbox
+
+# disable screensaver and screen blanking
+xset s off
+xset s noblank
+rm /etc/xdg/autostart/light-locker.desktop
