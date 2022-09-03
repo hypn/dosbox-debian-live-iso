@@ -11,50 +11,45 @@ sudo mkdir /tmp/srcdev
 DEVICE=$(mount | grep 'dev/s' | head -n1 | egrep -oh '[a-z/]{1,100}' | head -n 1)
 echo "Source device: $DEVICE"
 
-# Easy2Boot / agFM source partition
+# find and link or mount "dosbox-files":
+
+# 1. check for Disc or Easy2Boot (agFM) source drive (partition 1)
 sudo mount ${DEVICE}1 /tmp/srcdev 2>/dev/null
 if (ls /tmp/srcdev/dosbox-files 2>/dev/null); then
+  # map the source partition's directory into the home directory, for persistence!
+  mount --bind /tmp/srcdev/dosbox-files /home/user/dosbox
   echo "Dosbox files found on ${DEVICE}1"
-  DOSBOXFILES="/tmp/srcdev/dosbox-files"
+
 else
   sudo umount /tmp/srcdev 2>/dev/null
-fi
 
-# Easy2Boot / agFM mounted live iso
-if test -z "$DOSBOXFILES" ; then
+  # 2. check for Easy2Boot/agFM liveboot ISO (partition 4)
   sudo mount ${DEVICE}4 /tmp/srcdev 2>/dev/null
   if (ls /tmp/srcdev/dosbox-files 2>/dev/null); then
+    DOSBOXFILES="/tmp/srcdev/dosbox-files"
     echo "Dosbox files found on ${DEVICE}4"
-    DOSBOXFILES="/tmp/srcdev/dosbox-files"
+
   else
     sudo umount /tmp/srcdev 2>/dev/null
-  fi
-fi
 
-# CD / live iso
-if test -z "$DOSBOXFILES" ; then
-  sudo mount /dev/sr0 /tmp/srcdev 2>/dev/null
-  if (ls /tmp/srcdev/dosbox-files 2>/dev/null); then
-    echo "Dosbox files found on /dev/sr0"
-    DOSBOXFILES="/tmp/srcdev/dosbox-files"
-  else
-    sudo umount /tmp/srcdev 2>/dev/null
-  fi
-fi
+    # 3. check whatever medium is loaded (if any)
+    if test -z "$DOSBOXFILES" ; then
+      if (ls /run/live/medium/dosbox-files 2>/dev/null); then
+        DOSBOXFILES="/run/live/medium/dosbox-files"
+      fi
+    fi
 
-# this file system?
-if test -z "$DOSBOXFILES" ; then
-  if (ls /run/live/medium/dosbox-files 2>/dev/null); then
-    DOSBOXFILES="/run/live/medium/dosbox-files"
-  fi
-fi
+    # mount the overlay fs, if "dosbox-files" was found somewhere
+    if test -z "$DOSBOXFILES" ; then
+      echo "Could not find dosbox files :/"
+      sudo umount /tmp/srcdev 2>/dev/null
 
-if test -z "$DOSBOXFILES" ; then
-  echo "Could not find dosbox files :/"
-else
-  echo "DOSBox files = $DOSBOXFILES"
-  sudo mount -t tmpfs -o rw,nosuid,nodev,noexec,size=512m,mode=0775 tmpfs /tmp/.dosbox-tmpfs
-  sudo mkdir -p /tmp/.dosbox-tmpfs/upper
-  sudo mkdir -p /tmp/.dosbox-tmpfs/work
-  sudo mount -t overlay -o rw,lowerdir=$DOSBOXFILES,upperdir=/tmp/.dosbox-tmpfs/upper,workdir=/tmp/.dosbox-tmpfs/work overlay /home/user/dosbox
+    else
+      echo "DOSBox files = $DOSBOXFILES"
+      sudo mount -t tmpfs -o rw,nosuid,nodev,noexec,size=512m,mode=0775 tmpfs /tmp/.dosbox-tmpfs
+      sudo mkdir -p /tmp/.dosbox-tmpfs/upper
+      sudo mkdir -p /tmp/.dosbox-tmpfs/work
+      sudo mount -t overlay -o rw,lowerdir=$DOSBOXFILES,upperdir=/tmp/.dosbox-tmpfs/upper,workdir=/tmp/.dosbox-tmpfs/work overlay /home/user/dosbox
+    fi
+  fi
 fi
