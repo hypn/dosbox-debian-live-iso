@@ -3,7 +3,7 @@
 Build with the required docker image with:
 
 ```sh
-Docker build -t live-build .
+docker build -t live-build .
 ```
 
 Then run:
