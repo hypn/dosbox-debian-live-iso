@@ -1,6 +1,6 @@
 # General
 
-Build with the required docker image with:
+Build the required docker image with:
 
 ```sh
 docker build -t live-build .
